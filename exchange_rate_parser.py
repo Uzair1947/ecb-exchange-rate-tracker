@@ -22,29 +22,28 @@ def parse_current_exchange_rates(previous_day_rates):
     parent_cube = tree.find(".//ns:Cube", namespace)
 
     data = []
-    for cube in parent_cube.findall("ns:Cube", namespace)[::-1][-3]:
+    for cube in parent_cube.findall("ns:Cube", namespace):
         data_date = cube.attrib.get("time")
-        print(data_date)
-    #     for currency in cube.findall("ns:Cube", namespace):
-    #         currency_name = currency.attrib.get("currency")
-    #         rate = Decimal(currency.attrib.get("rate"))
+        for currency in cube.findall("ns:Cube", namespace):
+            currency_name = currency.attrib.get("currency")
+            rate = Decimal(currency.attrib.get("rate"))
     
-    #         if currency_name in previous_day_rates:
-    #             change = Decimal(((rate - previous_day_rates[currency_name]) / previous_day_rates[currency_name]) * 100)
-    #             data.append({
-    #                 "DATE": data_date,
-    #                 "CURRENCY": currency_name,
-    #                 "RATE": rate,
-    #                 "CHANGE": change
-    #             }) 
-    #         else:
-    #             data.append({
-    #                 "DATE": data_date,
-    #                 "CURRENCY": currency_name,
-    #                 "RATE": rate
-    #             }) 
+            if currency_name in previous_day_rates:
+                change = Decimal(((rate - previous_day_rates[currency_name]) / previous_day_rates[currency_name]) * 100)
+                data.append({
+                    "DATE": data_date,
+                    "CURRENCY": currency_name,
+                    "RATE": rate,
+                    "CHANGE": change
+                }) 
+            else:
+                data.append({
+                    "DATE": data_date,
+                    "CURRENCY": currency_name,
+                    "RATE": rate
+                }) 
     
-    # return data
+    return data
 
 # Function to parse quarterly exchange rates from ECB
 def parse_exchange_rates_quarterly():

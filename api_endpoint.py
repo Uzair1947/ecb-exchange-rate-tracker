@@ -1,8 +1,5 @@
-import logging
 from exchange_rates_manager import ExchangeRatesManager
 from utils import get_previous_friday,get_today_date,is_weekend,date_to_string_format_yyyy_mm_dd
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 # Handler function for AWS Lambda
@@ -60,7 +57,6 @@ def lambda_handler(event, context):
             }
 
     except Exception as e:
-        logging.error("Error occurred: %s", str(e))
         return {
             "statusCode": 500,
             "body": "An error occurred while processing the data"
