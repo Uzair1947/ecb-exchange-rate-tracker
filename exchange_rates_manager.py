@@ -1,7 +1,4 @@
 import boto3
-
-
-    
 class ExchangeRatesManager:
     def __init__(self):
         self.session = boto3.session.Session()
@@ -98,12 +95,9 @@ class ExchangeRatesManager:
         # Get a reference to the 'ExchangeRates' table
         self.table = self.dynamodb.Table(self.table_name)
 
-        # Sample data
-        data = fetch_data
-
         # Insert data into the table
         with self.table.batch_writer() as batch:
-            for item in data:
+            for item in fetch_data:
                 batch.put_item(Item=item)
 
         print("Data inserted successfully!")

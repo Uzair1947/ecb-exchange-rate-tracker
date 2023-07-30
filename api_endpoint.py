@@ -1,5 +1,5 @@
 from exchange_rates_manager import ExchangeRatesManager
-from utils import get_previous_friday,get_today_date,is_weekend,date_to_string_format_yyyy_mm_dd
+from date_utils import get_previous_friday,get_today_date,is_weekend,date_to_string_format_yyyy_mm_dd
 
 
 # Handler function for AWS Lambda

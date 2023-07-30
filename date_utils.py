@@ -1,4 +1,4 @@
-from datetime import date,timedelta
+from datetime import date,timedelta,datetime
 def date_subtractor(give_date: date, days_to_subtract: int) -> date:
     return give_date - timedelta(days=days_to_subtract)
 
@@ -20,3 +20,15 @@ def get_previous_date(current_date):
 
 def date_to_string_format_yyyy_mm_dd(date_obj):
     return date_obj.strftime('%Y-%m-%d')
+
+def compare_dates(previous_date,fetch_date):
+    # Convert date strings to datetime objects
+    current_date = get_today_date()
+    previous_date = previous_date
+    fetch_date = datetime.strptime(fetch_date, '%Y-%m-%d')
+ 
+    # Check for conditions
+    if current_date == fetch_date and current_date > previous_date:
+        return True
+    else:
+        return False

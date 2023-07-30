@@ -1,7 +1,7 @@
 import requests
 import xml.etree.ElementTree as ET
 from decimal import Decimal
-
+from date_utils import compare_dates
 # Helper function to fetch and parse XML data from ECB
 def fetch_ecb_xml_data(url):
     response = requests.get(url)
@@ -10,7 +10,7 @@ def fetch_ecb_xml_data(url):
     return response.content
 
 # Function to parse current exchange rates from ECB
-def parse_current_exchange_rates(previous_day_rates):
+def parse_current_exchange_rates(previous_day_rates,previous_date):
     base_url = "https://www.ecb.europa.eu/stats/eurofxref/"
     daily_sub_url = "eurofxref-daily.xml"
     url = base_url + daily_sub_url
@@ -22,31 +22,35 @@ def parse_current_exchange_rates(previous_day_rates):
     parent_cube = tree.find(".//ns:Cube", namespace)
 
     data = []
+
     for cube in parent_cube.findall("ns:Cube", namespace):
         data_date = cube.attrib.get("time")
-        for currency in cube.findall("ns:Cube", namespace):
-            currency_name = currency.attrib.get("currency")
-            rate = Decimal(currency.attrib.get("rate"))
-    
-            if currency_name in previous_day_rates:
-                change = Decimal(((rate - previous_day_rates[currency_name]) / previous_day_rates[currency_name]) * 100)
-                data.append({
-                    "DATE": data_date,
-                    "CURRENCY": currency_name,
-                    "RATE": rate,
-                    "CHANGE": change
-                }) 
-            else:
-                data.append({
-                    "DATE": data_date,
-                    "CURRENCY": currency_name,
-                    "RATE": rate
-                }) 
-    
-    return data
+        if compare_dates(previous_date=previous_date,fetch_date=data_date):
 
+            for currency in cube.findall("ns:Cube", namespace):
+                currency_name = currency.attrib.get("currency")
+                rate = Decimal(currency.attrib.get("rate"))
+        
+                if currency_name in previous_day_rates:
+                    change = Decimal(((rate - previous_day_rates[currency_name]) / previous_day_rates[currency_name]) * 100)
+                    data.append({
+                        "DATE": data_date,
+                        "CURRENCY": currency_name,
+                        "RATE": rate,
+                        "CHANGE": change
+                    }) 
+                else:
+                    data.append({
+                        "DATE": data_date,
+                        "CURRENCY": currency_name,
+                        "RATE": rate
+                    }) 
+        
+            return data
+        else:
+            return data
 # Function to parse quarterly exchange rates from ECB
-def parse_exchange_rates_quarterly():
+def parse_previous_exchange_rates():
     base_url = "https://www.ecb.europa.eu/stats/eurofxref/"
     quarterly_sub_url = "eurofxref-hist-90d.xml"
     url = base_url + quarterly_sub_url
@@ -59,7 +63,7 @@ def parse_exchange_rates_quarterly():
 
     data = []
     previous_day_rates = {}
-    for cube in parent_cube.findall("ns:Cube", namespace)[::-1]:
+    for cube in parent_cube.findall("ns:Cube", namespace)[::-1][-3:]:
         data_date = cube.attrib.get("time")
         for currency in cube.findall("ns:Cube", namespace):
             currency_name = currency.attrib.get("currency")
